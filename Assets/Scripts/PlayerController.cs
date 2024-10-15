@@ -10,18 +10,26 @@ public class PlayerController : MonoBehaviour
     public float airControlForce = 10.0f;
     public float airControlMax = 1.5f;
     Vector2 boxExtents;
+    Animator animator;
+    
     
     // Start is called before the first frame update
     void Start()
     {
         rigidBody = GetComponent<Rigidbody2D>();
         boxExtents = GetComponent<BoxCollider2D>().bounds.extents;
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (rigidBody.velocity.x * transform.localScale.x < 0.0f)
+            transform.localScale = new Vector3(-transform.localScale.x,
+                transform.localScale.y,transform.localScale.z);
+
+        float xSpeed = Mathf.Abs(rigidBody.velocity.x);
+        animator.SetFloat("xspeed", xSpeed);
     }
     
     void FixedUpdate()
