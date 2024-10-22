@@ -9,9 +9,9 @@ public class PlayerController : MonoBehaviour
     public float jumpForce = 8.0f;
     public float airControlForce = 10.0f;
     public float airControlMax = 1.5f;
+    public AudioSource coinSound;
     Vector2 boxExtents;
     Animator animator;
-    
     
     // Start is called before the first frame update
     void Start()
@@ -30,6 +30,13 @@ public class PlayerController : MonoBehaviour
 
         float xSpeed = Mathf.Abs(rigidBody.velocity.x);
         animator.SetFloat("xspeed", xSpeed);
+
+        float ySpeed = rigidBody.velocity.y;
+        animator.SetFloat("yspeed", ySpeed);
+
+        float blinkVal = Random.Range(0.0f, 200.0f);
+        if (blinkVal < 1.0f)
+            animator.SetTrigger("blinktrigger");
     }
     
     void FixedUpdate()
@@ -59,6 +66,15 @@ public class PlayerController : MonoBehaviour
                 if (h * vx < airControlMax)
                     rigidBody.AddForce(new Vector2(h * airControlForce, 0));
         
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D coll)
+    {
+        if (coll.gameObject.tag == "Coin")
+        {
+            coinSound.Play();
+            Destroy(coll.gameObject);
         }
     }
 }
