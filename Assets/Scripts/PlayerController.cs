@@ -12,7 +12,9 @@ public class PlayerController : MonoBehaviour
     public AudioSource coinSound;
     Vector2 boxExtents;
     Animator animator;
-    
+    public float boostSpeed;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -26,7 +28,7 @@ public class PlayerController : MonoBehaviour
     {
         if (rigidBody.velocity.x * transform.localScale.x < 0.0f)
             transform.localScale = new Vector3(-transform.localScale.x,
-                transform.localScale.y,transform.localScale.z);
+                transform.localScale.y, transform.localScale.z);
 
         float xSpeed = Mathf.Abs(rigidBody.velocity.x);
         animator.SetFloat("xspeed", xSpeed);
@@ -37,8 +39,21 @@ public class PlayerController : MonoBehaviour
         float blinkVal = Random.Range(0.0f, 200.0f);
         if (blinkVal < 1.0f)
             animator.SetTrigger("blinktrigger");
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector3 posInScreen = Camera.main.WorldToScreenPoint(transform.position);
+
+            //You can calculate the direction from point A to point B using Vector3 dirAtoB = B - A;
+            Vector3 dirToMouse = Input.mousePosition - posInScreen;
+
+            //We normalize the direction (= make length of 1). This is to avoid the object moving with greater force when I click further away
+            dirToMouse.Normalize();
+
+            GetComponent<Rigidbody2D>().AddForce(dirToMouse * -1 * boostSpeed, ForceMode2D.Impulse);
+        }
     }
-    
+
     void FixedUpdate()
     {
         float h = Input.GetAxis("Horizontal");
@@ -61,11 +76,11 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-                // allow a small amount of movement in the air
-                float vx = rigidBody.velocity.x;
-                if (h * vx < airControlMax)
-                    rigidBody.AddForce(new Vector2(h * airControlForce, 0));
-        
+            // allow a small amount of movement in the air
+            float vx = rigidBody.velocity.x;
+            if (h * vx < airControlMax)
+                rigidBody.AddForce(new Vector2(h * airControlForce, 0));
+
         }
     }
 
@@ -76,5 +91,8 @@ public class PlayerController : MonoBehaviour
             coinSound.Play();
             Destroy(coll.gameObject);
         }
+
     }
 }
+
+
